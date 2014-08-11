@@ -16,7 +16,19 @@ build-type:    Simple
 --------------------------------------------------------------------------------
 
 flag WASAPI
-  default: True
+  default: False
+
+flag DSound
+  default: False
+
+flag ALSA
+  default: False
+
+flag CoreAudio
+  default: False
+
+flag WMME
+  default: False
 
 library
   default-language: Haskell2010
@@ -75,15 +87,44 @@ library
       portaudio/src/hostapi/wasapi/mingw-include
     c-sources:
       portaudio/src/hostapi/wasapi/pa_win_wasapi.c
-    cc-options: -UPA_USE_WASAPI -DPA_USE_WASAPI=1
+    cc-options: -DPA_USE_WASAPI=1
 
---  if flag(DirectSound)
---    include-dirs:
---      portaudio/src/hostapi/dsound
---    c-sources:
---      portaudio/src/hostapi/dsound/pa_win_ds.c
---      portaudio/src/hostapi/dsound/pa_win_ds_dynlink.c
+  if flag(DSound)
+    include-dirs:
+      portaudio/src/hostapi/dsound
+    c-sources:
+      portaudio/src/hostapi/dsound/pa_win_ds.c
+      portaudio/src/hostapi/dsound/pa_win_ds_dynlink.c
+    cc-options: -DPA_USE_DS=1
 
+  if flag(WMME)
+    c-sources:
+      portaudio/src/hostapi/wmme/pa_win_wmme.c
+    cc-options: -DPA_USE_WMME=1
+
+  if flag(ALSA)
+    c-sources:
+      portaudio/src/hostapi/alsa/pa_linux_alsa.c
+    cc-options: -DPA_USE_ALSA=1
+
+  if flag(CoreAudio)
+    include-dirs:
+      portaudio/src/hostapi/coreaudio
+    c-sources:
+      portaudio/src/hostapi/coreaudio/pa_mac_core.c
+      portaudio/src/hostapi/coreaudio/pa_mac_core_blocking.c
+      portaudio/src/hostapi/coreaudio/pa_mac_core_old.c
+      portaudio/src/hostapi/coreaudio/pa_mac_core_utilities.c
+    cc-options: -DPA_USE_ALSA=1
+
+{- Unsupported
+  if flag(ASIO)
+    include-dirs:
+      portaudio/src/hostapi/asio
+    c-sources:
+      portaudio/src/hostapi/asio/pa_asio.cpp
+    cc-options: -DPA_USE_ASIO=1
+-}
 
 source-repository head
   type:     git
