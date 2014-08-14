@@ -8,7 +8,8 @@ Supported API Matrix
 WASAPI     | OK      |        |
 DirectSound| Unknown |        |
 WMME       | OK      |        |
+WDM K.S.   | WIP     |        |
 ALSA       |         | OK     |
 OSS        |         | WIP    |
 JACK       |         | WIP    |
-CoreAudio  |         |        | OK 
+CoreAudio  |         |        | Uncertain
