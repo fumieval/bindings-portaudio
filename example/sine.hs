@@ -4,11 +4,9 @@ import Control.Applicative
 import Control.Concurrent.MVar
 import Control.Monad
 import Foreign.C.String
+import Foreign
+-- CTypes are just type synonyms of Data.Int*/Data.Word*
 import Foreign.C.Types
-import Foreign.Marshal.Alloc
-import Foreign.Marshal.Utils
-import Foreign.Ptr
-import Foreign.Storable
 import qualified Data.Vector as V
 import System.Environment
 
