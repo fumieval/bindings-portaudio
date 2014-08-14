@@ -55,7 +55,7 @@ main = getArgs >>= \case
     s <- peek ps
 
     dbg "Starting the stream" $ c'Pa_StartStream s
-    c'Pa_Sleep 1000
+    c'Pa_Sleep $ 1000 * 1000
     dbg "Stopping the stream" $ c'Pa_StopStream s
     dbg "Closing the stream" $ c'Pa_CloseStream s
     c'Pa_Terminate
