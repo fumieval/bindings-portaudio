@@ -1,4 +1,4 @@
-{-# LANGUAGE ViewPatterns #-}
+{-# LANGUAGE ViewPatterns, LambdaCase #-}
 import Bindings.PortAudio
 import Control.Applicative
 import Control.Concurrent.MVar
@@ -10,6 +10,7 @@ import Foreign.Marshal.Utils
 import Foreign.Ptr
 import Foreign.Storable
 import qualified Data.Vector as V
+import System.Environment
 
 period :: Int
 period = 128
@@ -31,23 +32,30 @@ callback phase _ (castPtr -> o) (fromIntegral -> n) info _ _ = do
         pokeElemOff o (2 * i + 1) v
         go i0 (i + 1)
 
-main = do
-  c'Pa_Initialize >>= print
-  n <- c'Pa_GetHostApiCount
-  forM_ [0..n - 1] $ \i -> do
-    info <- c'Pa_GetHostApiInfo i >>= peek
-    name <- peekCAString $ c'PaHostApiInfo'name info
-    print (i, name)
+dbg s m = do
+  e <- m
+  putStrLn $ s ++ ": " ++ show e
+  unless (e == 0) $ fail "Failed."
 
-  ref <- newMVar 0
-  cb <- mk'PaStreamCallback $ callback ref
-  
-  ps <- malloc
-  c'Pa_OpenDefaultStream ps 0 2 1 48000 512 cb nullPtr >>= print
-  s <- peek ps
+main = getArgs >>= \case
+  ((read -> rate) : (read -> buf) : _) -> do
+    dbg "Initialization" c'Pa_Initialize
+    n <- c'Pa_GetHostApiCount
+    putStrLn "Available APIs: "
+    forM_ [0..n - 1] $ \i -> do
+      info <- c'Pa_GetHostApiInfo i >>= peek
+      name <- peekCAString $ c'PaHostApiInfo'name info
+      print (i, name)
 
-  c'Pa_StartStream s
-  forever $ c'Pa_Sleep 5000
-  c'Pa_StopStream s
-  c'Pa_CloseStream s
-  c'Pa_Terminate
+    ref <- newMVar 0
+    cb <- mk'PaStreamCallback $ callback ref
+    
+    ps <- malloc
+    dbg "Opening the default stream" $ c'Pa_OpenDefaultStream ps 0 2 1 rate buf cb nullPtr
+    s <- peek ps
+
+    dbg "Starting the stream" $ c'Pa_StartStream s
+    c'Pa_Sleep 1000
+    dbg "Stopping the stream" $ c'Pa_StopStream s
+    dbg "Closing the stream" $ c'Pa_CloseStream s
+    c'Pa_Terminate
