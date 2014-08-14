@@ -31,7 +31,6 @@ callback phase _ (castPtr -> o) (fromIntegral -> n) info _ _ = do
         pokeElemOff o (2 * i + 1) v
         go i0 (i + 1)
 
-
 main = do
   c'Pa_Initialize >>= print
   n <- c'Pa_GetHostApiCount
