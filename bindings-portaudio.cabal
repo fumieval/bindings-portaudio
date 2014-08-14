@@ -121,14 +121,13 @@ library
       portaudio/src/hostapi/coreaudio/pa_mac_core_utilities.c
     cc-options: -DPA_USE_COREAUDIO=1
 
-{- Unsupported
-  if flag(ASIO)
-    include-dirs:
-      portaudio/src/hostapi/asio
-    c-sources:
-      portaudio/src/hostapi/asio/pa_asio.cpp
-    cc-options: -DPA_USE_ASIO=1
--}
+-- Unsupported
+--   if flag(ASIO)
+--     include-dirs:
+--       portaudio/src/hostapi/asio
+--     c-sources:
+--       portaudio/src/hostapi/asio/pa_asio.cpp
+--     cc-options: -DPA_USE_ASIO=1
 
 source-repository head
   type:     git
