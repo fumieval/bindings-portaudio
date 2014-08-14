@@ -68,7 +68,8 @@ library
       portaudio/src/os/unix
     c-sources:
       portaudio/src/os/unix/pa_unix_hostapis.c
-      portaudio/src/os/unix/pa_unix_util.c 
+      portaudio/src/os/unix/pa_unix_util.c
+    cc-options: -DHAVE_CLOCK_GETTIME=1
     extra-libraries: pthread
 
   if os(mingw32)
@@ -107,7 +108,7 @@ library
   if flag(ALSA)
     c-sources:
       portaudio/src/hostapi/alsa/pa_linux_alsa.c
-    cc-options: -DPA_USE_ALSA=1
+    cc-options: -DPA_USE_ALSA=1 -DHAVE_NANOSLEEP=1 
     extra-libraries: asound
 
   if flag(CoreAudio)

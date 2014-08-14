@@ -17,15 +17,20 @@ period = 128
 table :: V.Vector CFloat
 table = V.fromList [sin t | i <- [0..period - 1], let t = fromIntegral i / fromIntegral period * 2 * pi]
 
-callback phase _ o_ (fromIntegral -> n) info _ _ = do
-  let o = castPtr o_
+callback phase _ (castPtr -> o) (fromIntegral -> n) info _ _ = do
   i0 <- takeMVar phase
-  forM_ [0..n-1] $ \i -> do
-    let v = table V.! ((i0 + i) `mod` period)
-    pokeElemOff o (2 * i) v
-    pokeElemOff o (2 * i + 1) v
+  go i0 0
   putMVar phase $ i0 + n
   return c'paContinue
+  where
+    go i0 i
+      | i == n = return ()
+      | otherwise = do
+        let v = table V.! ((i0 + i) `mod` period)
+        pokeElemOff o (2 * i) v
+        pokeElemOff o (2 * i + 1) v
+        go i0 (i + 1)
+
 
 main = do
   c'Pa_Initialize >>= print
@@ -39,7 +44,7 @@ main = do
   cb <- mk'PaStreamCallback $ callback ref
   
   ps <- malloc
-  c'Pa_OpenDefaultStream ps 0 2 1 44100 2048 cb nullPtr >>= print
+  c'Pa_OpenDefaultStream ps 0 2 1 48000 512 cb nullPtr >>= print
   s <- peek ps
 
   c'Pa_StartStream s
