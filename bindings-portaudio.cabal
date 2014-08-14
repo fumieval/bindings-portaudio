@@ -131,7 +131,7 @@ library
     c-sources:
       portaudio/src/hostapi/coreaudio/pa_mac_core.c
       portaudio/src/hostapi/coreaudio/pa_mac_core_blocking.c
-      portaudio/src/hostapi/coreaudio/pa_mac_core_old.c
+      -- portaudio/src/hostapi/coreaudio/pa_mac_core_old.c
       portaudio/src/hostapi/coreaudio/pa_mac_core_utilities.c
     cc-options: -DPA_USE_COREAUDIO=1
     Frameworks:
