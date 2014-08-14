@@ -28,7 +28,7 @@ callback phase _ o_ (fromIntegral -> n) info _ _ = do
   return c'paContinue
 
 main = do
-  _ <- c'Pa_Initialize
+  c'Pa_Initialize >>= print
   n <- c'Pa_GetHostApiCount
   forM_ [0..n - 1] $ \i -> do
     info <- c'Pa_GetHostApiInfo i >>= peek
@@ -39,11 +39,11 @@ main = do
   cb <- mk'PaStreamCallback $ callback ref
   
   ps <- malloc
-  c'Pa_OpenDefaultStream ps 0 2 1 44100 1024 cb nullPtr
+  c'Pa_OpenDefaultStream ps 0 2 1 44100 2048 cb nullPtr >>= print
   s <- peek ps
 
   c'Pa_StartStream s
-  c'Pa_Sleep 5000
+  forever $ c'Pa_Sleep 5000
   c'Pa_StopStream s
   c'Pa_CloseStream s
   c'Pa_Terminate

@@ -69,6 +69,7 @@ library
     c-sources:
       portaudio/src/os/unix/pa_unix_hostapis.c
       portaudio/src/os/unix/pa_unix_util.c 
+    extra-libraries: pthread
 
   if os(mingw32)
     include-dirs:
@@ -107,6 +108,7 @@ library
     c-sources:
       portaudio/src/hostapi/alsa/pa_linux_alsa.c
     cc-options: -DPA_USE_ALSA=1
+    extra-libraries: asound
 
   if flag(CoreAudio)
     include-dirs:
