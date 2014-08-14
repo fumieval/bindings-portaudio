@@ -62,7 +62,20 @@ library
     portaudio/src/common/pa_dither.c
     portaudio/src/common/pa_trace.c
   cc-options: -g -O2
-    -DPA_LITTLE_ENDIAN -DSTDC_HEADERS=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_STDLIB_H=1 -DHAVE_STRING_H=1 -DHAVE_MEMORY_H=1 -DHAVE_STRINGS_H=1 -DHAVE_INTTYPES_H=1 -DHAVE_STDINT_H=1 -DHAVE_UNISTD_H=1 -DSIZEOF_SHORT=2 -DSIZEOF_INT=4 -DSIZEOF_LONG=4
+    -DHAVE_INTTYPES_H=1
+    -DHAVE_MEMORY_H=1
+    -DHAVE_STDINT_H=1
+    -DHAVE_STDLIB_H=1
+    -DHAVE_STRING_H=1
+    -DHAVE_STRINGS_H=1
+    -DHAVE_SYS_STAT_H=1
+    -DHAVE_SYS_TYPES_H=1
+    -DHAVE_UNISTD_H=1
+    -DPA_LITTLE_ENDIAN
+    -DSIZEOF_INT=4
+    -DSIZEOF_LONG=4
+    -DSIZEOF_SHORT=2
+    -DSTDC_HEADERS=1
 
   if os(linux) || os(freebsd) || os(darwin)
     include-dirs:
@@ -70,7 +83,7 @@ library
     c-sources:
       portaudio/src/os/unix/pa_unix_hostapis.c
       portaudio/src/os/unix/pa_unix_util.c
-    cc-options: -DHAVE_CLOCK_GETTIME=1
+    cc-options: -DHAVE_CLOCK_GETTIME=1 -DHAVE_NANOSLEEP=1
     extra-libraries: pthread
 
   if os(mingw32)
@@ -109,7 +122,7 @@ library
   if flag(ALSA)
     c-sources:
       portaudio/src/hostapi/alsa/pa_linux_alsa.c
-    cc-options: -DPA_USE_ALSA=1 -DHAVE_NANOSLEEP=1 
+    cc-options: -DPA_USE_ALSA=1
     extra-libraries: asound
 
   if flag(CoreAudio)
