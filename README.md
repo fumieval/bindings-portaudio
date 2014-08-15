@@ -1,7 +1,7 @@
 bindings-portaudio
 ==================
 
-Why not [portaudio](http://hackage.haskell.org/portaudio) package?
+Why not [portaudio](http://hackage.haskell.org/package/portaudio) package?
 ---
 bindings-portaudio contains the original [portaudio](http://www.portaudio.com/) itself so that you don't need to build portaudio by hand.
 
