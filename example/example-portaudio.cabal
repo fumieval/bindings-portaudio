@@ -23,4 +23,5 @@ executable example-portaudio
                      , bindings-portaudio
                      , vector >= 0.10 && < 0.11
   -- hs-source-dirs:
+  ghc-options: -threaded
   default-language:    Haskell2010
