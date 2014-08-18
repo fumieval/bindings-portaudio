@@ -18,16 +18,16 @@ build-type:    Simple
 flag WASAPI
   default: False
 
-flag DSound
-  default: False
-
-flag ALSA
-  default: False
-
-flag CoreAudio
+flag DirectSound
   default: False
 
 flag WMME
+  default: False
+
+flag WDMKS
+  default: False
+
+flag MinGW-External
   default: False
 
 library
@@ -77,16 +77,10 @@ library
     -DSIZEOF_SHORT=2
     -DSTDC_HEADERS=1
 
-  if os(linux) || os(freebsd) || os(darwin)
-    include-dirs:
-      portaudio/src/os/unix
-    c-sources:
-      portaudio/src/os/unix/pa_unix_hostapis.c
-      portaudio/src/os/unix/pa_unix_util.c
-    cc-options: -DHAVE_CLOCK_GETTIME=1 -DHAVE_NANOSLEEP=1
-    extra-libraries: pthread
+  if os(linux) || os(freebsd) || os(darwin) || flag(MinGW-External)
+    pkgconfig-depends: portaudio-2.0
 
-  if os(mingw32)
+  if os(mingw32) && !flag(MinGW-External)
     include-dirs:
       portaudio/src/os/win
     c-sources:
@@ -99,54 +93,31 @@ library
     extra-libraries: winmm ole32 uuid
     cc-options: -mthreads
 
-  if flag(WASAPI)
-    include-dirs:
-      portaudio/src/hostapi/wasapi/mingw-include
-    c-sources:
-      portaudio/src/hostapi/wasapi/pa_win_wasapi.c
-    cc-options: -DPA_USE_WASAPI=1
+    if flag(WASAPI)
+      include-dirs:
+        portaudio/src/hostapi/wasapi/mingw-include
+      c-sources:
+        portaudio/src/hostapi/wasapi/pa_win_wasapi.c
+      cc-options: -DPA_USE_WASAPI=1
 
-  if flag(DSound)
-    include-dirs:
-      portaudio/src/hostapi/dsound
-    c-sources:
-      portaudio/src/hostapi/dsound/pa_win_ds.c
-      portaudio/src/hostapi/dsound/pa_win_ds_dynlink.c
-    cc-options: -DPA_USE_DS=1
+    if flag(DirectSound)
+      include-dirs:
+        portaudio/src/hostapi/dsound
+      c-sources:
+        portaudio/src/hostapi/dsound/pa_win_ds.c
+        portaudio/src/hostapi/dsound/pa_win_ds_dynlink.c
+      cc-options: -DPA_USE_DS=1
 
-  if flag(WMME)
-    c-sources:
-      portaudio/src/hostapi/wmme/pa_win_wmme.c
-    cc-options: -DPA_USE_WMME=1
+    if flag(WMME)
+      c-sources:
+        portaudio/src/hostapi/wmme/pa_win_wmme.c
+      cc-options: -DPA_USE_WMME=1
 
-  if flag(ALSA)
-    c-sources:
-      portaudio/src/hostapi/alsa/pa_linux_alsa.c
-    cc-options: -DPA_USE_ALSA=1
-    extra-libraries: asound
-
-  if flag(CoreAudio)
-    include-dirs:
-      portaudio/src/hostapi/coreaudio
-    c-sources:
-      portaudio/src/hostapi/coreaudio/pa_mac_core.c
-      portaudio/src/hostapi/coreaudio/pa_mac_core_blocking.c
-      -- portaudio/src/hostapi/coreaudio/pa_mac_core_old.c
-      portaudio/src/hostapi/coreaudio/pa_mac_core_utilities.c
-    cc-options: -DPA_USE_COREAUDIO=1
-    Frameworks:
-      CoreAudio
-      AudioToolbox
-      AudioUnit
-      Carbon
-
--- Unsupported
---   if flag(ASIO)
---     include-dirs:
---       portaudio/src/hostapi/asio
---     c-sources:
---       portaudio/src/hostapi/asio/pa_asio.cpp
---     cc-options: -DPA_USE_ASIO=1
+    if flag(WDMKS)
+      c-sources:
+        portaudio/src/hostapi/wdmks/pa_win_wdmks.c
+      cc-options: -DPA_USE_WDMKS=1
+      extra-libraries: Setupapi
 
 source-repository head
   type:     git
