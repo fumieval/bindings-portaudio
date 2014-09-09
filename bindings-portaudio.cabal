@@ -1,5 +1,5 @@
 name:         bindings-portaudio
-version:      0.0
+version:      0
 category:     Sound
 
 author:       Fumiaki Kinoshita <fumiexcel@gmail.com>
@@ -77,7 +77,7 @@ library
     -DSIZEOF_SHORT=2
     -DSTDC_HEADERS=1
 
-  if os(linux) || os(freebsd) || os(darwin) || flag(MinGW-External)
+  if os(linux) || os(freebsd) || os(darwin)
     pkgconfig-depends: portaudio-2.0
 
   if os(mingw32) && !flag(MinGW-External)
