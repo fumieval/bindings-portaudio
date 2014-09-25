@@ -1,0 +1,1 @@
+const int GUID_NULL = 0;

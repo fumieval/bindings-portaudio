@@ -1,5 +1,5 @@
 name:         bindings-portaudio
-version:      0
+version:      0.0.1
 category:     Sound
 
 author:       Fumiaki Kinoshita <fumiexcel@gmail.com>
@@ -62,20 +62,6 @@ library
     portaudio/src/common/pa_dither.c
     portaudio/src/common/pa_trace.c
   cc-options: -g -O2
-    -DHAVE_INTTYPES_H=1
-    -DHAVE_MEMORY_H=1
-    -DHAVE_STDINT_H=1
-    -DHAVE_STDLIB_H=1
-    -DHAVE_STRING_H=1
-    -DHAVE_STRINGS_H=1
-    -DHAVE_SYS_STAT_H=1
-    -DHAVE_SYS_TYPES_H=1
-    -DHAVE_UNISTD_H=1
-    -DPA_LITTLE_ENDIAN
-    -DSIZEOF_INT=4
-    -DSIZEOF_LONG=4
-    -DSIZEOF_SHORT=2
-    -DSTDC_HEADERS=1
 
   if os(linux) || os(freebsd) || os(darwin)
     pkgconfig-depends: portaudio-2.0
@@ -84,14 +70,29 @@ library
     include-dirs:
       portaudio/src/os/win
     c-sources:
+      extra.c
       portaudio/src/os/win/pa_win_coinitialize.c
       portaudio/src/os/win/pa_win_hostapis.c
       portaudio/src/os/win/pa_win_util.c
       portaudio/src/os/win/pa_win_waveformat.c
       portaudio/src/os/win/pa_win_wdmks_utils.c
       -- portaudio/src/os/win/pa_x86_plain_converters.c
-    extra-libraries: winmm ole32 uuid
+    extra-libraries: winmm ole32
     cc-options: -mthreads
+      -DHAVE_INTTYPES_H=1
+      -DHAVE_MEMORY_H=1
+      -DHAVE_STDINT_H=1
+      -DHAVE_STDLIB_H=1
+      -DHAVE_STRING_H=1
+      -DHAVE_STRINGS_H=1
+      -DHAVE_SYS_STAT_H=1
+      -DHAVE_SYS_TYPES_H=1
+      -DHAVE_UNISTD_H=1
+      -DPA_LITTLE_ENDIAN
+      -DSIZEOF_INT=4
+      -DSIZEOF_LONG=4
+      -DSIZEOF_SHORT=2
+      -DSTDC_HEADERS=1
 
     if flag(WASAPI)
       include-dirs:
