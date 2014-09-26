@@ -1,6 +1,6 @@
 {-# OPTIONS_GHC -fno-warn-unused-imports #-}
 #include <bindings.dsl.h>
-#include "../../portaudio/include/portaudio.h"
+#include <portaudio.h>
 module Bindings.PortAudio where
 import Foreign.Ptr
 #strict_import
