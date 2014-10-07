@@ -119,4 +119,4 @@ library
 
 source-repository head
   type:     git
-  location: https://github.com/fumieval/portaudio-builtin.git
+  location: https://github.com/fumieval/bindings-portaudio.git
