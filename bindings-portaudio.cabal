@@ -13,6 +13,13 @@ description:
 cabal-version: >= 1.10
 build-type:    Simple
 
+extra-source-files:
+  portaudio/*
+  extra.c
+  LICENSE
+  README
+  example/*
+
 --------------------------------------------------------------------------------
 
 flag WASAPI
