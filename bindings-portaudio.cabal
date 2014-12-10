@@ -14,7 +14,7 @@ cabal-version: >= 1.10
 build-type:    Simple
 
 extra-source-files:
-  portaudio/src/include/*.h
+  portaudio/include/*.h
   portaudio/src/common/*.c
   portaudio/src/common/*.h
   portaudio/src/hostapi/alsa/*.c
