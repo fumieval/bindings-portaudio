@@ -17,17 +17,18 @@ extra-source-files:
   portaudio/include/*.h
   portaudio/src/common/*.c
   portaudio/src/common/*.h
-  portaudio/src/hostapi/alsa/*.c
   portaudio/src/hostapi/wmme/*.c
   portaudio/src/hostapi/wdmks/*.c
   portaudio/src/hostapi/wasapi/*.c
-  portaudio/src/hostapi/mingw-include/*.c
+  portaudio/src/hostapi/wasapi/mingw-include/*.h
   portaudio/src/os/win/*.c
   portaudio/src/os/win/*.h
   extra.c
   LICENSE
-  README
-  example/*
+  README.md
+  example/*.hs
+  example/example-portaudio.cabal
+  example/LICENSE
 
 --------------------------------------------------------------------------------
 
@@ -63,7 +64,7 @@ library
   build-depends:
     base          < 5, bindings-DSL == 1.0.*
 
-  cc-options: -g -O2
+  cc-options: -g
 
   if os(linux) || os(freebsd) || os(darwin) || !flag(Bundle)
     pkgconfig-depends: portaudio-2.0
