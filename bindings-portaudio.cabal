@@ -65,11 +65,8 @@ library
 
   cc-options: -g -O2
 
-  if os(linux) || os(freebsd) || os(darwin)
+  if os(linux) || os(freebsd) || os(darwin) || !flag(Bundle)
     pkgconfig-depends: portaudio-2.0
-  
-  if !flag(Bundle)
-    extra-libraries: libportaudio-2
 
   if os(mingw32) && flag(Bundle)
     include-dirs:
