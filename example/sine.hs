@@ -32,7 +32,9 @@ callback phase _ (castPtr -> o) (fromIntegral -> n) info _ _ = do
 dbg s m = do
   e <- m
   putStrLn $ s ++ ": " ++ show e
-  unless (e == 0) $ fail "Failed."
+  unless (e == c'paNoError) $ do
+    et <- c'Pa_GetErrorText e >>= peekCAString
+    fail $ "Failed: " ++ et
 
 main = getArgs >>= \case
   ((read -> rate) : (read -> buf) : _) -> do
@@ -46,7 +48,7 @@ main = getArgs >>= \case
 
     ref <- newMVar 0
     cb <- mk'PaStreamCallback $ callback ref
-    
+
     ps <- malloc
     dbg "Opening the default stream" $ c'Pa_OpenDefaultStream ps 0 2 1 rate buf cb nullPtr
     s <- peek ps
