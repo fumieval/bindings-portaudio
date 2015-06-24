@@ -11,6 +11,7 @@ module System.PortAudio(
   , Output
   -- * Opening a stream
   , withStream
+  , StreamCallbackResult(..)
   -- * Stream parameters
   , StreamParameters
   , streamParameters
@@ -173,6 +174,16 @@ w n = do
 withPortAudio :: IO a -> IO a
 withPortAudio = bracket_ (w c'Pa_Initialize) (w c'Pa_Terminate)
 
+data StreamCallbackResult = Continue | Complete | Abort deriving (Show, Eq, Ord, Enum)
+
+instance Monoid StreamCallbackResult where
+  mempty = Continue
+  mappend Abort _ = Abort
+  mappend _ Abort = Abort
+  mappend Continue _ = Continue
+  mappend _ Continue = Continue
+  mappend Complete Complete = Complete
+
 data Status = Status
   { currentTime :: !Double
   , inputBufferAdcTime :: !Double
@@ -189,7 +200,7 @@ withStream :: (Storable i, Storable o)
   -> Maybe (StreamParameters Input i)
   -> Maybe (StreamParameters Output o)
   -> StreamFlags
-  -> (Status -> V.Vector i -> MV.IOVector o -> IO ()) -- ^ callback
+  -> (Status -> V.Vector i -> MV.IOVector o -> IO StreamCallbackResult) -- ^ callback
   -> IO r
   -> IO r
 withStream rate buf paramI paramO (StreamFlags flags) f m =
@@ -209,12 +220,12 @@ withStream rate buf paramI paramO (StreamFlags flags) f m =
     bracket opener (\s -> w (c'Pa_CloseStream s) >> free s)
       $ \s -> bracket_ (w $ c'Pa_StartStream s) (w $ c'Pa_StopStream s) m
 
-callback :: (Storable a, Storable b) => (Status -> V.Vector a -> MV.IOVector b -> IO ()) -> Ptr () -> Ptr () -> CULong -> Ptr C'PaStreamCallbackTimeInfo -> CULong -> z -> IO CUInt
+callback :: (Storable a, Storable b) => (Status -> V.Vector a -> MV.IOVector b -> IO StreamCallbackResult) -> Ptr () -> Ptr () -> CULong -> Ptr C'PaStreamCallbackTimeInfo -> CULong -> z -> IO CUInt
 callback f (castPtr -> pin) (castPtr -> pout) (fromIntegral -> n) pinfo flags _ = do
   ip <- newForeignPtr_ pin
   op <- newForeignPtr_ pout
   info <- peek pinfo
-  f (Status (realToFrac $ c'PaStreamCallbackTimeInfo'currentTime info)
+  fmap (toEnum . fromEnum) $ f (Status (realToFrac $ c'PaStreamCallbackTimeInfo'currentTime info)
       (realToFrac $ c'PaStreamCallbackTimeInfo'inputBufferAdcTime info)
       (realToFrac $ c'PaStreamCallbackTimeInfo'outputBufferDacTime info)
       (testBit flags 0)
@@ -224,7 +235,6 @@ callback f (castPtr -> pin) (castPtr -> pout) (fromIntegral -> n) pinfo flags _ 
       (testBit flags 4))
     (V.unsafeFromForeignPtr0 ip n)
     (MV.unsafeFromForeignPtr0 op n)
-  return c'paContinue
 
 withMaybe :: Storable a => Maybe a -> (Ptr a -> IO b) -> IO b
 withMaybe Nothing c = c nullPtr
