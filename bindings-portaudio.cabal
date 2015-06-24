@@ -1,5 +1,5 @@
 name:         bindings-portaudio
-version:      0.1
+version:      0.2
 category:     Sound
 
 author:       Fumiaki Kinoshita <fumiexcel@gmail.com>
@@ -57,12 +57,13 @@ library
 
   exposed-modules:
     Bindings.PortAudio
+    System.PortAudio
 
   build-tools:
     hsc2hs
 
   build-depends:
-    base          < 5, bindings-DSL == 1.0.*
+    base          < 5, bindings-DSL == 1.0.*, vector
 
   cc-options: -g
 
@@ -75,7 +76,6 @@ library
       portaudio/include
       portaudio/src/common
     c-sources:
-      extra.c
       portaudio/src/os/win/pa_win_coinitialize.c
       portaudio/src/os/win/pa_win_hostapis.c
       portaudio/src/os/win/pa_win_util.c
@@ -127,6 +127,7 @@ library
     if flag(WMME)
       c-sources:
         portaudio/src/hostapi/wmme/pa_win_wmme.c
+        extra.c
       cc-options: -DPA_USE_WMME=1
 
     if flag(WDMKS)
