@@ -7,6 +7,8 @@ module System.PortAudio(
   -- * Devices
   , getDevices
   , Device(..)
+  , Input
+  , Output
   -- * Opening a stream
   , withStream
   -- * Stream parameters
