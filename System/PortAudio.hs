@@ -177,12 +177,12 @@ withPortAudio = bracket_ (w c'Pa_Initialize) (w c'Pa_Terminate)
 data StreamCallbackResult = Continue | Complete | Abort deriving (Show, Eq, Ord, Enum)
 
 instance Monoid StreamCallbackResult where
-  mempty = Continue
+  mempty = Complete
+  mappend Complete x = x
+  mappend x Complete = x
   mappend Abort _ = Abort
   mappend _ Abort = Abort
-  mappend Continue _ = Continue
-  mappend _ Continue = Continue
-  mappend Complete Complete = Complete
+  mappend Continue Continue = Continue
 
 data Status = Status
   { currentTime :: !Double
