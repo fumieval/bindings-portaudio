@@ -16,6 +16,8 @@ module System.PortAudio(
   , StreamParameters
   , streamParameters
   , PortAudioSample
+  , Closed(..)
+  , noConnection
   -- * Timestamps and status flags
   , Status(..)
   -- * Stream flags
@@ -219,6 +221,18 @@ withStream rate buf paramI paramO (StreamFlags flags) f m =
           peek ps
     bracket opener (\s -> w (c'Pa_CloseStream s) >> free s)
       $ \s -> bracket_ (w $ c'Pa_StartStream s) (w $ c'Pa_StopStream s) m
+
+data Closed = Closed
+
+instance Storable Closed where
+  sizeOf _ = 0
+  alignment _ = 1
+  peek _ = return Closed
+  poke _ _ = return ()
+
+-- | This is 'Nothing', but it explicitly specifies the stream type with zero-width unit type.
+noConnection :: Maybe (StreamParameters t Closed)
+noConnection = Nothing
 
 callback :: (Storable a, Storable b) => (Status -> V.Vector a -> MV.IOVector b -> IO StreamCallbackResult) -> Ptr () -> Ptr () -> CULong -> Ptr C'PaStreamCallbackTimeInfo -> CULong -> z -> IO CUInt
 callback f (castPtr -> pin) (castPtr -> pout) (fromIntegral -> n) pinfo flags _ = do
