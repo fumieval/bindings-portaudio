@@ -11,6 +11,11 @@ cabal.sandbox.config
 cabal.config
 
 # =========================
+# Stack
+# =========================
+.stack-work
+
+# =========================
 # Operating System Files
 # =========================
 

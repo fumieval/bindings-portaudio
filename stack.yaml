@@ -1,0 +1,17 @@
+resolver: lts-3.11
+
+packages:
+- '.'
+- example/
+
+extra-deps: []
+
+flags:
+  bindings-portaudio:
+    wasapi: false
+    wdmks: false
+    bundle: false
+    wmme: false
+    directsound: false
+
+extra-package-dbs: []
