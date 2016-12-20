@@ -21,7 +21,7 @@ executable example-portaudio
   -- other-extensions:
   build-depends:       base >=4.6 && < 5
                      , bindings-portaudio
-                     , vector >= 0.10 && < 0.11
+                     , vector >= 0.10 && < 0.12
   -- hs-source-dirs:
   ghc-options: -threaded
   default-language:    Haskell2010
