@@ -5,9 +5,10 @@ import Control.Concurrent.MVar
 import Control.Monad
 import Foreign.C.String
 import Foreign.C.Types
-import Foreign
+import Foreign hiding (void)
 import qualified Data.Vector as V
 import System.Environment
+import System.Exit
 
 period :: Int
 period = 128
@@ -15,7 +16,10 @@ period = 128
 table :: V.Vector CFloat
 table = V.fromList [sin t | i <- [0..period - 1], let t = fromIntegral i / fromIntegral period * 2 * pi]
 
-callback phase _ (castPtr -> o) (fromIntegral -> n) info _ _ = do
+
+callback :: MVar Int -> Ptr () -> Ptr () -> CULong -> Ptr C'PaStreamCallbackTimeInfo
+            -> C'PaStreamCallbackFlags -> Ptr () -> IO C'PaStreamCallbackResult
+callback phase _ (castPtr -> o) (fromIntegral -> n) _info _ _ = do
   i0 <- takeMVar phase
   go i0 0
   putMVar phase $ i0 + n
@@ -29,6 +33,7 @@ callback phase _ (castPtr -> o) (fromIntegral -> n) info _ _ = do
         pokeElemOff o (2 * i + 1) v
         go i0 (i + 1)
 
+dbg :: [Char] -> IO CInt -> IO ()
 dbg s m = do
   e <- m
   putStrLn $ s ++ ": " ++ show e
@@ -36,6 +41,7 @@ dbg s m = do
     et <- c'Pa_GetErrorText e >>= peekCAString
     fail $ "Failed: " ++ et
 
+main :: IO ()
 main = getArgs >>= \case
   ((read -> rate) : (read -> buf) : _) -> do
     dbg "Initialization" c'Pa_Initialize
@@ -57,4 +63,11 @@ main = getArgs >>= \case
     c'Pa_Sleep 1000
     dbg "Stopping the stream" $ c'Pa_StopStream s
     dbg "Closing the stream" $ c'Pa_CloseStream s
-    c'Pa_Terminate
+    void c'Pa_Terminate
+  _ -> usageExit
+
+usageExit :: IO ()
+usageExit = do
+  pname <- getProgName
+  putStrLn $ "\nUsage: " ++ pname ++ " <sample rate> <buffer size>\n"
+  exitSuccess
