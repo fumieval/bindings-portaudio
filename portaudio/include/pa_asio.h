@@ -1,7 +1,8 @@
 #ifndef PA_ASIO_H
 #define PA_ASIO_H
+
 /*
- * $Id: pa_asio.h 1667 2011-05-02 15:49:20Z rossb $
+ * $Id$
  * PortAudio Portable Real-Time Audio Library
  * ASIO specific extensions
  *
@@ -28,13 +29,13 @@
  */
 
 /*
- * The text above constitutes the entire PortAudio license; however, 
+ * The text above constitutes the entire PortAudio license; however,
  * the PortAudio community also makes the following non-binding requests:
  *
  * Any person wishing to distribute modifications to the Software is
  * requested to send the modifications to the original developer so that
- * they can be incorporated into the canonical version. It is also 
- * requested that these non-binding requests be included along with the 
+ * they can be incorporated into the canonical version. It is also
+ * requested that these non-binding requests be included along with the
  * license above.
  */
 
@@ -97,7 +98,7 @@ PaError PaAsio_ShowControlPanel( PaDeviceIndex device, void* systemSpecific );
 PaError PaAsio_GetInputChannelName( PaDeviceIndex device, int channelIndex,
         const char** channelName );
 
-        
+
 /** Retrieve a pointer to a string containing the name of the specified
  input channel. The string is valid until Pa_Terminate is called.
 
@@ -108,11 +109,11 @@ PaError PaAsio_GetOutputChannelName( PaDeviceIndex device, int channelIndex,
 
 
 /** Set the sample rate of an open paASIO stream.
- 
- @param stream The stream to operate on.
- @param sampleRate The new sample rate. 
 
- Note that this function may fail if the stream is alredy running and the 
+ @param stream The stream to operate on.
+ @param sampleRate The new sample rate.
+
+ Note that this function may fail if the stream is alredy running and the
  ASIO driver does not support switching the sample rate of a running stream.
 
  Returns paIncompatibleStreamHostApi if stream is not a paASIO stream.

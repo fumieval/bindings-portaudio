@@ -82,14 +82,15 @@ library
       portaudio/src/os/win/pa_win_waveformat.c
       portaudio/src/os/win/pa_win_wdmks_utils.c
       portaudio/src/common/pa_allocation.c
-      portaudio/src/common/pa_front.c
       portaudio/src/common/pa_converters.c
-      portaudio/src/common/pa_process.c
       portaudio/src/common/pa_cpuload.c
-      portaudio/src/common/pa_ringbuffer.c
       portaudio/src/common/pa_debugprint.c
-      portaudio/src/common/pa_stream.c
       portaudio/src/common/pa_dither.c
+      portaudio/src/common/pa_front.c
+      portaudio/src/common/pa_gitrevision.c
+      portaudio/src/common/pa_process.c
+      portaudio/src/common/pa_ringbuffer.c
+      portaudio/src/common/pa_stream.c
       portaudio/src/common/pa_trace.c
       -- portaudio/src/os/win/pa_x86_plain_converters.c
     extra-libraries: winmm ole32
