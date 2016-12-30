@@ -1,69 +1,47 @@
 {-# LANGUAGE ViewPatterns, LambdaCase #-}
-import Bindings.PortAudio
+import System.PortAudio
 import Control.Applicative
-import Control.Concurrent.MVar
+import Control.Concurrent
 import Control.Monad
 import Foreign.C.String
 import Foreign.C.Types
 import Foreign hiding (void)
+import Linear (V2(..))
 import qualified Data.Vector as V
+import qualified Data.Vector.Storable.Mutable as MV
 import System.Environment
 import System.Exit
 
 period :: Int
 period = 128
 
-table :: V.Vector CFloat
+table :: V.Vector Float
 table = V.fromList [sin t | i <- [0..period - 1], let t = fromIntegral i / fromIntegral period * 2 * pi]
 
-
-callback :: MVar Int -> Ptr () -> Ptr () -> CULong -> Ptr C'PaStreamCallbackTimeInfo
-            -> C'PaStreamCallbackFlags -> Ptr () -> IO C'PaStreamCallbackResult
-callback phase _ (castPtr -> o) (fromIntegral -> n) _info _ _ = do
+callback :: MVar Int -> Status -> input -> MV.IOVector (V2 Float) -> IO StreamCallbackResult
+callback phase _ _ o = do
   i0 <- takeMVar phase
   go i0 0
   putMVar phase $ i0 + n
-  return c'paContinue
+  return Continue
   where
+    n = MV.length o
+    go :: Int -> Int -> IO ()
     go i0 i
       | i == n = return ()
       | otherwise = do
         let v = table V.! ((i0 + i) `mod` period)
-        pokeElemOff o (2 * i) v
-        pokeElemOff o (2 * i + 1) v
+        MV.write o i (V2 v v)
         go i0 (i + 1)
-
-dbg :: [Char] -> IO CInt -> IO ()
-dbg s m = do
-  e <- m
-  putStrLn $ s ++ ": " ++ show e
-  unless (e == c'paNoError) $ do
-    et <- c'Pa_GetErrorText e >>= peekCAString
-    fail $ "Failed: " ++ et
 
 main :: IO ()
 main = getArgs >>= \case
-  ((read -> rate) : (read -> buf) : _) -> do
-    dbg "Initialization" c'Pa_Initialize
-    n <- c'Pa_GetHostApiCount
-    putStrLn "Available APIs: "
-    forM_ [0..n - 1] $ \i -> do
-      info <- c'Pa_GetHostApiInfo i >>= peek
-      name <- peekCAString $ c'PaHostApiInfo'name info
-      print (i, name)
-
-    ref <- newMVar 0
-    cb <- mk'PaStreamCallback $ callback ref
-
-    ps <- malloc
-    dbg "Opening the default stream" $ c'Pa_OpenDefaultStream ps 0 2 1 rate buf cb nullPtr
-    s <- peek ps
-
-    dbg "Starting the stream" $ c'Pa_StartStream s
-    c'Pa_Sleep 1000
-    dbg "Stopping the stream" $ c'Pa_StopStream s
-    dbg "Closing the stream" $ c'Pa_CloseStream s
-    void c'Pa_Terminate
+  ((read -> rate) : (read -> buf) : _) -> withPortAudio $ do
+    (_, dev : _) <- getDevices
+    phase <- newMVar 0
+    let output = streamParameters dev 0
+    withStream rate buf noConnection output mempty (callback phase)
+      $ threadDelay $ 1000 * 1000
   _ -> usageExit
 
 usageExit :: IO ()
