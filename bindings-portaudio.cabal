@@ -87,7 +87,6 @@ library
       portaudio/src/common/pa_debugprint.c
       portaudio/src/common/pa_dither.c
       portaudio/src/common/pa_front.c
-      portaudio/src/common/pa_gitrevision.c
       portaudio/src/common/pa_process.c
       portaudio/src/common/pa_ringbuffer.c
       portaudio/src/common/pa_stream.c
