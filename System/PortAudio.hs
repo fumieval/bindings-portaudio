@@ -170,13 +170,13 @@ neverDropInput = StreamFlags 0x00000004
 primeOutputBuffersUsingStreamCallback :: StreamFlags
 primeOutputBuffersUsingStreamCallback = StreamFlags 0x00000008
 
-w :: IO CInt -> IO ()
-w n = do
+wrap :: IO CInt -> IO ()
+wrap n = do
   r <- n
   unless (r == 0) $ throwIO $ fromErrorCode r
 
 withPortAudio :: IO a -> IO a
-withPortAudio = bracket_ (w c'Pa_Initialize) (w c'Pa_Terminate)
+withPortAudio = bracket_ (wrap c'Pa_Initialize) (wrap c'Pa_Terminate)
 
 data StreamCallbackResult = Continue | Complete | Abort deriving (Show, Eq, Ord, Enum)
 
@@ -212,9 +212,8 @@ withStream :: (Storable i, Storable o)
 withStream rate buf paramI paramO (StreamFlags flags) f m =
   withMaybe paramI $ \pin -> withMaybe paramO $ \pout -> do
     cb <- mk'PaStreamCallback $ callback f
-    let opener = do
-          ps <- malloc
-          w $ c'Pa_OpenStream ps
+    let opener ps = do
+          wrap $ c'Pa_OpenStream ps
               (castPtr pin)
               (castPtr pout)
               (CDouble rate)
@@ -223,8 +222,8 @@ withStream rate buf paramI paramO (StreamFlags flags) f m =
               cb
               nullPtr
           peek ps
-    bracket opener (\s -> w (c'Pa_CloseStream s) >> free s)
-      $ \s -> bracket_ (w $ c'Pa_StartStream s) (w $ c'Pa_StopStream s) m
+    alloca $ \ps -> bracket (opener ps) (wrap . c'Pa_CloseStream)
+      $ \s -> bracket_ (wrap $ c'Pa_StartStream s) (wrap $ c'Pa_StopStream s) m
 
 data Closed = Closed
 

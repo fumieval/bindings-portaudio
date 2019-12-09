@@ -1,3 +1,4 @@
+cabal-version: 2.4
 name:         bindings-portaudio
 version:      0.2
 category:     Sound
@@ -5,12 +6,11 @@ category:     Sound
 author:       Fumiaki Kinoshita <fumiexcel@gmail.com>
 maintainer:   Fumiaki Kinoshita <fumiexcel@gmail.com>
 
-license:      BSD3
+license:      BSD-3-Clause
 license-file: LICENSE
 
 synopsis:     Low-level bindings to portaudio library
 description:
-cabal-version: >= 1.10
 build-type:    Simple
 
 extra-source-files:
@@ -63,7 +63,7 @@ library
     hsc2hs
 
   build-depends:
-    base          < 5, bindings-DSL == 1.0.*, vector
+    base          < 5, bindings-DSL ^>= 1.0, vector
 
   cc-options: -g
 

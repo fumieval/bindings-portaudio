@@ -21,7 +21,7 @@ executable example-portaudio
   -- other-extensions:
   build-depends:       base >=4.6 && < 5
                      , bindings-portaudio
-                     , vector >= 0.10 && < 0.12
+                     , vector >= 0.10 && < 0.13
                      , linear
   -- hs-source-dirs:
   ghc-options: -threaded -Wall -O2

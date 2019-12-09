@@ -1,11 +1,6 @@
 {-# LANGUAGE ViewPatterns, LambdaCase #-}
 import System.PortAudio
-import Control.Applicative
 import Control.Concurrent
-import Control.Monad
-import Foreign.C.String
-import Foreign.C.Types
-import Foreign hiding (void)
 import Linear (V2(..))
 import qualified Data.Vector as V
 import qualified Data.Vector.Storable.Mutable as MV
