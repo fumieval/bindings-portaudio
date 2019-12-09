@@ -1,6 +1,6 @@
 cabal-version: 2.4
 name:         bindings-portaudio
-version:      0.2
+version:      0.2.1
 category:     Sound
 
 author:       Fumiaki Kinoshita <fumiexcel@gmail.com>
@@ -26,6 +26,7 @@ extra-source-files:
   extra.c
   LICENSE
   README.md
+  CHANGELOG.md
   example/*.hs
   example/example-portaudio.cabal
   example/LICENSE
