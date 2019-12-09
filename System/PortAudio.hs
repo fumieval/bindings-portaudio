@@ -152,9 +152,11 @@ streamParameters dev t
 
 newtype StreamFlags = StreamFlags CULong
 
+instance Semigroup StreamFlags where
+  StreamFlags a <> StreamFlags b = StreamFlags (a .|. b)
+
 instance Monoid StreamFlags where
   mempty = StreamFlags 0
-  StreamFlags a `mappend` StreamFlags b = StreamFlags (a .|. b)
 
 clipOff :: StreamFlags
 clipOff = StreamFlags 0x00000001
@@ -178,13 +180,15 @@ withPortAudio = bracket_ (w c'Pa_Initialize) (w c'Pa_Terminate)
 
 data StreamCallbackResult = Continue | Complete | Abort deriving (Show, Eq, Ord, Enum)
 
+instance Semigroup StreamCallbackResult where
+  Complete <> x = x
+  x <> Complete = x
+  Abort <> _ = Abort
+  _ <> Abort = Abort
+  Continue <> Continue = Continue
+
 instance Monoid StreamCallbackResult where
   mempty = Complete
-  mappend Complete x = x
-  mappend x Complete = x
-  mappend Abort _ = Abort
-  mappend _ Abort = Abort
-  mappend Continue Continue = Continue
 
 data Status = Status
   { currentTime :: !Double
