@@ -1,11 +1,12 @@
 {-# LANGUAGE ViewPatterns, LambdaCase #-}
+{-# LANGUAGE ApplicativeDo #-}
 import System.PortAudio
 import Control.Concurrent
+import Control.Monad
 import Linear (V2(..))
 import qualified Data.Vector as V
 import qualified Data.Vector.Storable.Mutable as MV
-import System.Environment
-import System.Exit
+import Options.Applicative
 
 period :: Int
 period = 128
@@ -30,17 +31,24 @@ callback phase _ _ o = do
         go i0 (i + 1)
 
 main :: IO ()
-main = getArgs >>= \case
-  ((read -> rate) : (read -> buf) : _) -> withPortAudio $ do
-    (_, dev : _) <- getDevices
-    phase <- newMVar 0
-    let output = streamParameters dev 0
-    withStream rate buf noConnection output mempty (callback phase)
-      $ threadDelay $ 1000 * 1000
-  _ -> usageExit
+main = join $ execParser (info app mempty)
 
-usageExit :: IO ()
-usageExit = do
-  pname <- getProgName
-  putStrLn $ "\nUsage: " ++ pname ++ " <sample rate> <buffer size>\n"
-  exitSuccess
+app :: Parser (IO ())
+app = do
+  rate <- option auto $ long "rate" <> help "sampling rate" <> value 44100
+  buf <- option auto $ long "buffer" <> help "number of samples for the buffer" <> value 1024
+  device <- option auto $ long "device" <> help "device index" <> value (-1)
+  helper
+  pure $ withPortAudio $ do
+    (_, devs) <- getDevices
+    if device < 0
+      then forM_ (zip [0 :: Int ..] devs) $ \(i, dev) ->
+        putStrLn $ show i ++ ": " ++ deviceName dev
+      else do
+        let dev = devs !! device
+        phase <- newMVar 0
+        let output = streamParameters dev 0
+        withStream rate buf noConnection output mempty (callback phase)
+          $ \s -> do
+            setStreamFinishedCallback s $ putStrLn "Done"
+            withStartStream s $ threadDelay $ 1000 * 1000

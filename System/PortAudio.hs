@@ -10,13 +10,18 @@ module System.PortAudio(
   , Input
   , Output
   -- * Opening a stream
+  , Stream
   , withStream
   , StreamCallbackResult(..)
+  , startStream
+  , stopStream
+  , withStartStream
+  , isStreamStopped
+  , setStreamFinishedCallback
   -- * Stream parameters
   , StreamParameters
   , streamParameters
   , PortAudioSample
-  , Closed(..)
   , noConnection
   -- * Timestamps and status flags
   , Status(..)
@@ -200,6 +205,8 @@ data Status = Status
   , outputOverflow :: !Bool
   , primingOutput :: !Bool }
 
+newtype Stream = Stream { unStream :: Ptr C'PaStream }
+
 withStream :: (Storable i, Storable o)
   => Double -- ^ sampling rate
   -> Int -- ^ buffer size
@@ -207,7 +214,7 @@ withStream :: (Storable i, Storable o)
   -> Maybe (StreamParameters Output o)
   -> StreamFlags
   -> (Status -> V.Vector i -> MV.IOVector o -> IO StreamCallbackResult) -- ^ callback
-  -> IO r
+  -> (Stream -> IO r)
   -> IO r
 withStream rate buf paramI paramO (StreamFlags flags) f m =
   withMaybe paramI $ \pin -> withMaybe paramO $ \pout -> do
@@ -222,19 +229,27 @@ withStream rate buf paramI paramO (StreamFlags flags) f m =
               cb
               nullPtr
           peek ps
-    alloca $ \ps -> bracket (opener ps) (wrap . c'Pa_CloseStream)
-      $ \s -> bracket_ (wrap $ c'Pa_StartStream s) (wrap $ c'Pa_StopStream s) m
+    alloca $ \ps -> bracket (opener ps) (wrap . c'Pa_CloseStream) $ m . Stream
 
-data Closed = Closed
+startStream :: Stream -> IO ()
+startStream = wrap . c'Pa_StartStream . unStream
 
-instance Storable Closed where
-  sizeOf _ = 0
-  alignment _ = 1
-  peek _ = return Closed
-  poke _ _ = return ()
+stopStream :: Stream -> IO ()
+stopStream = wrap . c'Pa_StopStream . unStream
+
+setStreamFinishedCallback :: Stream -> IO () -> IO ()
+setStreamFinishedCallback (Stream s) m = do
+  cb <- mk'PaStreamFinishedCallback (const m)
+  wrap $ c'Pa_SetStreamFinishedCallback s cb
+
+isStreamStopped :: Stream -> IO Bool
+isStreamStopped = fmap (==1) . c'Pa_IsStreamStopped . unStream
+
+withStartStream :: Stream -> IO r -> IO r
+withStartStream s = bracket_ (startStream s) (stopStream s)
 
 -- | This is 'Nothing', but it explicitly specifies the stream type with zero-width unit type.
-noConnection :: Maybe (StreamParameters t Closed)
+noConnection :: Maybe (StreamParameters t ())
 noConnection = Nothing
 
 callback :: (Storable a, Storable b) => (Status -> V.Vector a -> MV.IOVector b -> IO StreamCallbackResult) -> Ptr () -> Ptr () -> CULong -> Ptr C'PaStreamCallbackTimeInfo -> CULong -> z -> IO CUInt

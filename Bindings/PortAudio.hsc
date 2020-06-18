@@ -221,7 +221,7 @@ import Foreign.Ptr
 #ccall Pa_OpenStream , Ptr (Ptr <PaStream>) -> Ptr <struct PaStreamParameters> -> Ptr <struct PaStreamParameters> -> CDouble -> CULong -> CULong -> <PaStreamCallback> -> Ptr () -> IO CInt
 #ccall Pa_OpenDefaultStream , Ptr (Ptr <PaStream>) -> CInt -> CInt -> CULong -> CDouble -> CULong -> <PaStreamCallback> -> Ptr () -> IO CInt
 #ccall Pa_CloseStream , Ptr <PaStream> -> IO CInt
-#ccall Pa_SetStreamFinishedCallback , Ptr <PaStream> -> Ptr <PaStreamFinishedCallback> -> IO CInt
+#ccall Pa_SetStreamFinishedCallback , Ptr <PaStream> -> <PaStreamFinishedCallback> -> IO CInt
 #ccall Pa_StartStream , Ptr <PaStream> -> IO CInt
 #ccall Pa_StopStream , Ptr <PaStream> -> IO CInt
 #ccall Pa_AbortStream , Ptr <PaStream> -> IO CInt
