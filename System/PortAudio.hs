@@ -203,7 +203,7 @@ data Status = Status
   , inputOverflow :: !Bool
   , outputUnderflow :: !Bool
   , outputOverflow :: !Bool
-  , primingOutput :: !Bool }
+  , primingOutput :: !Bool } deriving (Show, Eq, Ord)
 
 newtype Stream = Stream { unStream :: Ptr C'PaStream }
 
